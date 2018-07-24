@@ -1,6 +1,6 @@
 """
 Maxime Darrin
-Implementation of the Mixture Autoencoder self from https://arxiv.org/abs/1712.07788 by D.Zhang
+Implementation of the Mixture Autoencoder from https://arxiv.org/abs/1712.07788 by D.Zhang
 """
 
 import tensorflow as tf
@@ -119,7 +119,14 @@ class mixture_autoencoder():
                  self.sample_entropy: sample_entropy,
                  self.batch_entropy: batch_entropy
                  })
-            history.append((loss, batch_wise, p_mean))
+
+        loss, batch_wise_entropy, p_mean = self.sess.run(
+            [self.loss, self.batch_wise_entropy, self.p_mean], feed_dict=
+            {self.X: X[shuffle][j * self.batch_size:(j + 1) * self.batch_size],
+             self.sample_entropy: sample_entropy,
+             self.batch_entropy: batch_entropy
+             })
+        return loss, batch_wise_entropy, p_mean
 
     def __build_cluster_loss(self, k):
         loss = tf.reduce_sum(tf.pow(self.Y_true - self.Y_preds[k], 2, name="cluster_loss"), 1) * self.classifier[:, k]

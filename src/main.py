@@ -7,7 +7,7 @@ if __name__ == "__main__":
     argparser = argparse.ArgumentParser("Mixture Autoencoder model")
 
     argparser.add_argument("--input", nargs="+", type=int,
-                           help=".mat file to open, should contain an array of shape (num_data, data_dim)")
+                           help=".mat file to open, should contain an array of shape (num_data, data_dim) named X")
 
     argparser.add_argument("--model-file", nargs="+", type=int,
                            help="File to dump weights after training")

@@ -43,8 +43,6 @@ class mixture_autoencoder():
 
         self.losses = []
 
-        self.saver = tf.train.Saver()
-
         self.sess = None
 
     def compile(self):
@@ -105,6 +103,8 @@ class mixture_autoencoder():
         self.train_network = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
         self.init = tf.global_variables_initializer()
+
+        self.saver = tf.train.Saver()
 
     def init_session(self):
         """

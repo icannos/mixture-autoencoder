@@ -1,12 +1,19 @@
 import numpy as np
 from scipy.io import savemat
+from sys import argv
 
 
-centers = np.random.uniform(-1,1, (3, 8))
+
+if len(argv) < 5:
+    print("Build a test set")
+    print("python gen_test_normal.py num_clusters vector_dim standard_deviation clusters_size")
+    exit(0)
+
+centers = np.random.uniform(-1,1, (argv[1], argv[2]))
 
 clusters = []
 for c in centers:
-    clusters.append(np.random.normal(c, 0.3, (1000, 8)))
+    clusters.append(np.random.normal(c, argv[3], (argv[4], argv[2])))
 
 clusters = np.asarray(clusters)
 

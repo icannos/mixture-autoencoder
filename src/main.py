@@ -17,13 +17,13 @@ if __name__ == "__main__":
                            help="Where to store the results of the prediction of X_test, the file will a contain a"
                                 "results array.")
 
-    argparser.add_argument("--save-model-file", nargs="+", type=str,
+    argparser.add_argument("--save-model-file", type=str,
                            help="File to dump weights after training, if training steps > 0")
 
-    argparser.add_argument("--load-model-file", nargs="+", type=str,
+    argparser.add_argument("--load-model-file",  type=str,
                            help="File from which load weigths")
 
-    argparser.add_argument("--training-steps", nargs="+", type=int, default=0,
+    argparser.add_argument("--training-steps", type=int, default=0,
                            help="Number of training steps to perform")
 
     argparser.add_argument("--autoencoder-topology", nargs="+", type=int,

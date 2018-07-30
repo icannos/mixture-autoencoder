@@ -31,7 +31,7 @@ if __name__ == "__main__":
     argparser.add_argument("--classifier-topology", nargs="+", type=int,
                            help="Dimension of each hidden layer of the classifier network")
     argparser.add_argument("--input-dim", type=int, help="dimension of an entry vector")
-    argparser.add_argument("--num-cluster", type=int, help="Number of expected clusters")
+    argparser.add_argument("--num-clusters", type=int, help="Number of expected clusters")
     argparser.add_argument("--autoencoders-activation", nargs="+", type=str,
                            help="Name of the activation function. Available: tanh sigmoid relu")
 
@@ -40,11 +40,12 @@ if __name__ == "__main__":
 
     args = argparser.parse_args()
 
-    model = mixture_autoencoder(autoencoders_topology=tuple(args.autoencodertopology),
-                                classifier_topology=tuple(args.classifiertopology),
-                                autoencoders_activation=tuple(args.autoencodersactivation),
-                                input_dim=args.inputdim,
-                                num_clusters=args.numcluster)
+
+    model = mixture_autoencoder(autoencoders_topology=tuple(args.autoencoder_topology),
+                                classifier_topology=tuple(args.classifier_topology),
+                                autoencoders_activation=tuple(args.autoencoders_activation),
+                                input_dim=args.input_dim,
+                                num_clusters=args.num_clusters)
 
 
     model.compile()
@@ -52,28 +53,29 @@ if __name__ == "__main__":
     model.init_session()
 
 
+
     ### Loading data
-    data = fetch_matlab_data(args.input)
+    data = fetch_matlab_data(args.input_train)
 
     if args.loadmodelfile is not None:
-        model.saver.restore(model.sess, args.loadmodelfile)
+        model.saver.restore(model.sess, args.load_model_file)
 
-    if args.inputtrain is not None:
-        X_train = fetch_matlab_data(args.inputtrain)
+    if args.input_train is not None:
+        X_train = fetch_matlab_data(args.input_train)
 
-        for _ in range(args.trainingstep):
+        for _ in range(args.training_steps):
             print(model.train(X_train, entropy_strategy="balanced"))
 
-    if args.inputpredict is not None:
-        X_test = fetch_matlab_data(args.inputpredict)
+    if args.input_predict is not None:
+        X_test = fetch_matlab_data(args.input_predict)
 
         if args.output is not None:
             savemat(args.output, {"results": model.predict(X_test)})
         else:
             print(model.predict(X_test))
 
-    if args.savemodelfile is not None and args.trainingstep > 0:
-        model.saver.save(model.save, args.savemodelfile)
+    if args.save_model_file is not None and args.training_steps > 0:
+        model.saver.save(model.save, args.save_model_file)
 
 
 

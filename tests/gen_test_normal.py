@@ -10,7 +10,7 @@ for c in centers:
 
 clusters = np.asarray(clusters)
 
-savemat("clusters_norm_10_train", {"X": clusters})
+savemat("clusters_norm_10_train.mat", {"X": clusters})
 
 for i,c in enumerate(centers):
-    savemat("clusters_norm_10_test_" + str(i), {"X":np.random.normal(c, 0.3, 1000)})
+    savemat("clusters_norm_10_test_" + str(i) +".mat", {"X":np.random.normal(c, 0.3, 1000)})

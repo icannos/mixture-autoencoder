@@ -6,20 +6,22 @@ Implementation of the Mixture Autoencoder from https://arxiv.org/abs/1712.07788 
 import tensorflow as tf
 import numpy as np
 
-class mixture_autoencoder():
 
-    def __init__(self, learning_rate=0.001, training_steps=3000, batch_size=256, autoencoders_topology=(128, 64, 8), classifier_topology=(8, 8), input_dim=1024,
+class mixture_autoencoder():
+    sample_entropy = None
+
+    def __init__(self, learning_rate=0.001, training_steps=3000, batch_size=256, autoencoders_topology=(128, 64, 8),
+                 classifier_topology=(8, 8), input_dim=1024,
                  num_clusters=8,
                  autoencoders_activation=(tf.nn.tanh, tf.nn.tanh, tf.nn.tanh)):
         """
-
+        Basic initializer, all parameters can be changed by updating
         :param autoencoders_topology: defines the topology of the autoencoders (size of each hidden layer)
         :param classifier_topology: defines the topology of the classifier (size of each hidden layer)
         :param input_dim: size of one input vector
         :param num_clusters: number of expected cluster
         :param autoencoders_activation: function (graph) to use as activation function
         """
-
 
         # Parameters
         self.learning_rate = learning_rate
@@ -32,13 +34,7 @@ class mixture_autoencoder():
         self.num_clusters = num_clusters
         self.autoencoder_activation = autoencoders_activation
 
-        self.sample_entropy = tf.placeholder("float")
-        self.batch_entropy = tf.placeholder("float")
-        self.learning_rate = tf.placeholder("float")
-        self.X = tf.placeholder("float", [None, input_dim])
-        self.Y_true = self.X
-
-
+        # Graph variables
         self.encoders = []
         self.decoders = []
         self.autoencoders_weights = []
@@ -52,6 +48,15 @@ class mixture_autoencoder():
         self.sess = None
 
     def compile(self):
+        """
+        Build the graph from the parameters of the class
+        :return: None, defines the graph variable that we could want to compute
+        """
+        self.sample_entropy = tf.placeholder("float")
+        self.batch_entropy = tf.placeholder("float")
+        self.learning_rate = tf.placeholder("float")
+        self.X = tf.placeholder("float", [None, self.input_dim])
+        self.Y_true = self.X
 
         # Weights initialization & autoencoder building
         for k in range(self.num_clusters):
@@ -101,18 +106,34 @@ class mixture_autoencoder():
 
         self.init = tf.global_variables_initializer()
 
-
     def init_session(self):
+        """
+        Initializes a new compute session and randoms weights
+        :return:
+        """
         self.sess = tf.Session()
         self.sess.run(self.init)
 
-    def train(self, X, sample_entropy, batch_entropy):
+    def train(self, X, entropy_strategy=None, sample_entropy=None, batch_entropy=None):
+        """
+        Performs one training step
+        :param X: input vector
+        :param sample_entropy: weight of the sample_entropy term
+        :param batch_entropy: weight of the batch_entropy term
+        :return: TBD
+        """
         shuffle = np.arange(X.shape[0])
         np.random.shuffle(shuffle)
 
-        history = []
-
         for j in range(X.shape[0] // self.batch_size - 2):
+            if entropy_strategy == "balanced":
+                sample_entropy, batch_entropy = \
+                    self.sess.run([self.strat_sample_entropy, self.strat_batch_entropy],
+                                  feed_dict=
+                                  {self.X: X[shuffle][
+                                           j * self.batch_size:(j + 1) * self.batch_size],
+                                   })
+
             _, loss, batch_wise, p_mean = self.sess.run(
                 [self.train_network, self.loss, self.batch_wise_entropy, self.p_mean], feed_dict=
                 {self.X: X[shuffle][j * self.batch_size:(j + 1) * self.batch_size],
@@ -128,12 +149,22 @@ class mixture_autoencoder():
              })
         return loss, batch_wise_entropy, p_mean
 
+    def predict(self, X):
+        """
+        Return clustering prediction for that input
+        :param X: input
+        :return: cluster prediction
+        """
+        return self.sess.run([self.classifier], feed_dict={self.X: X})[0]
+
+    # Private methods
+
     def __build_cluster_loss(self, k):
-        loss = tf.reduce_sum(tf.pow(self.Y_true - self.Y_preds[k], 2, name="cluster_loss"), 1) * self.classifier[:, k]
-        return loss
+        return tf.reduce_sum(tf.pow(self.Y_true - self.Y_preds[k], 2, name="cluster_loss" + str(k)),
+                             1) * self.classifier[:, k]
 
     def __build_loss(self):
-        self.losses = tf.stack(self.losses)
+        losses = tf.stack(self.losses)
 
         self.element_wise_entropy = - tf.reduce_sum(self.classifier * tf.log(self.classifier), 1)
 
@@ -141,13 +172,15 @@ class mixture_autoencoder():
 
         self.batch_wise_entropy = - tf.reduce_sum(self.p_mean * tf.log(self.p_mean), 0)
 
-        self.reconstr_loss = tf.reduce_mean(tf.reduce_sum(self.losses,0))
+        self.reconstr_loss = tf.reduce_mean(tf.reduce_sum(losses, 0))
 
-        self.sample_loss =  tf.reduce_mean(tf.reduce_sum(self.losses,0) +
-                    self.sample_entropy * self.element_wise_entropy)
+        self.strat_sample_entropy, self.strat_batch_entropy = self.__build_strats_entropies()
 
-        loss = tf.reduce_mean(tf.reduce_sum(self.losses,0) +
-                    self.sample_entropy * self.element_wise_entropy) - self.batch_entropy * self.batch_wise_entropy
+        self.sample_loss = tf.reduce_mean(tf.reduce_sum(self.losses, 0) +
+                                          self.sample_entropy * self.element_wise_entropy)
+
+        loss = tf.reduce_mean(tf.reduce_sum(self.losses, 0) +
+                              self.sample_entropy * self.element_wise_entropy) - self.batch_entropy * self.batch_wise_entropy
 
         return loss
 
@@ -191,4 +224,25 @@ class mixture_autoencoder():
 
         return layer
 
+    def __build_strats_entropies(self, strat="balanced"):
+        if strat == "balanced":
+            return self.__build_entropy_strategy_balanced()
 
+    def __build_entropy_strategy_balanced(self):
+        """
+        Strategy for choosing alpha & beta (sample entropy and batch entropy), we try to maintain all the terms of
+        the error at the same magnitude
+        :return:
+        """
+        cluster_mean_loss = tf.reduce_mean(self.losses)
+
+        sample_mean_entropy = tf.reduce_mean(- tf.reduce_sum(self.classifier * tf.log(self.classifier), 1))
+
+        sample_entropy = cluster_mean_loss / sample_mean_entropy
+
+        preloss = tf.reduce_mean(tf.reduce_sum(self.losses, 0) + sample_entropy * self.element_wise_entropy)
+        batch_mean_entropy = tf.reduce_mean(- tf.reduce_sum(self.p_mean * tf.log(self.p_mean), 0))
+
+        batch_entropy = batch_mean_entropy / preloss
+
+        return (sample_entropy, batch_entropy)

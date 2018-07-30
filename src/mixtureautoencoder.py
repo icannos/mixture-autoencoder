@@ -10,7 +10,7 @@ import numpy as np
 class mixture_autoencoder():
     sample_entropy = None
 
-    def __init__(self, learning_rate=0.001, training_steps=3000, batch_size=256, autoencoders_topology=(128, 64, 8),
+    def __init__(self, training_steps=3000, batch_size=256, autoencoders_topology=(128, 64, 8),
                  classifier_topology=(8, 8), input_dim=1024,
                  num_clusters=8,
                  autoencoders_activation=(tf.nn.tanh, tf.nn.tanh, tf.nn.tanh)):
@@ -24,7 +24,6 @@ class mixture_autoencoder():
         """
 
         # Parameters
-        self.learning_rate = learning_rate
         self.training_steps = training_steps
         self.batch_size = batch_size
 
@@ -114,7 +113,7 @@ class mixture_autoencoder():
         self.sess = tf.Session()
         self.sess.run(self.init)
 
-    def train(self, X, entropy_strategy="balanced", sample_entropy=0, batch_entropy=0):
+    def train(self, X, entropy_strategy="balanced", sample_entropy=0, batch_entropy=0, learning_rate=0.001):
         """
         Performs one training step
         :param X: input vector
@@ -138,7 +137,8 @@ class mixture_autoencoder():
                 [self.train_network, self.loss, self.batch_wise_entropy, self.p_mean], feed_dict=
                 {self.X: X[shuffle][j * self.batch_size:(j + 1) * self.batch_size],
                  self.sample_entropy: sample_entropy,
-                 self.batch_entropy: batch_entropy
+                 self.batch_entropy: batch_entropy,
+                 self.learning_rate:learning_rate
                  })
 
         loss, batch_wise_entropy, p_mean = self.sess.run(

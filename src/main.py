@@ -49,8 +49,7 @@ if __name__ == "__main__":
         if s == "sigmoid":
             activations.append(tf.nn.sigmoid)
 
-    model = mixture_autoencoder(learning_rate=0.001,
-                                autoencoders_topology=tuple(args.autoencoder_topology),
+    model = mixture_autoencoder(autoencoders_topology=tuple(args.autoencoder_topology),
                                 classifier_topology=tuple(args.classifier_topology),
                                 autoencoders_activation=activations,
                                 input_dim=args.input_dim,

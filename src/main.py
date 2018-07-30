@@ -83,7 +83,7 @@ if __name__ == "__main__":
             print(model.predict(X_test))
 
     if args.save_model_file is not None and args.training_steps > 0:
-        model.saver.save(model.save, args.save_model_file)
+        model.saver.save(model.sess, args.save_model_file)
 
 
 

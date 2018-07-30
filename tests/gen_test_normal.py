@@ -2,7 +2,7 @@ import numpy as np
 from scipy.io import savemat
 
 
-centers = np.random.uniform(-1,1, (10, 8))
+centers = np.random.uniform(-1,1, (3, 8))
 
 clusters = []
 for c in centers:

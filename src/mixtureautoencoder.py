@@ -114,7 +114,7 @@ class mixture_autoencoder():
         self.sess = tf.Session()
         self.sess.run(self.init)
 
-    def train(self, X, entropy_strategy=None, sample_entropy=None, batch_entropy=None):
+    def train(self, X, entropy_strategy="balanced", sample_entropy=0, batch_entropy=0):
         """
         Performs one training step
         :param X: input vector

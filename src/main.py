@@ -41,9 +41,17 @@ if __name__ == "__main__":
     args = argparser.parse_args()
 
 
+    activations = list()
+
+    for s in args.autoencoders_activation:
+        if s == "tanh":
+            activations.append(tf.nn.tanh)
+        if s == "sigmoid":
+            activations.append(tf.nn.sigmoid)
+
     model = mixture_autoencoder(autoencoders_topology=tuple(args.autoencoder_topology),
                                 classifier_topology=tuple(args.classifier_topology),
-                                autoencoders_activation=tuple(args.autoencoders_activation),
+                                autoencoders_activation=activations,
                                 input_dim=args.input_dim,
                                 num_clusters=args.num_clusters)
 

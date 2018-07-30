@@ -9,11 +9,11 @@ if len(argv) < 5:
     print("python gen_test_normal.py num_clusters vector_dim standard_deviation clusters_size")
     exit(0)
 
-centers = np.random.uniform(-1,1, (argv[1], argv[2]))
+centers = np.random.uniform(-1,1, (int(argv[1]), int(argv[2])))
 
 clusters = []
 for c in centers:
-    clusters.append(np.random.normal(c, argv[3], (argv[4], argv[2])))
+    clusters.append(np.random.normal(c, float(argv[3]), (int(argv[4]), int(argv[2]))))
 
 clusters = np.asarray(clusters)
 

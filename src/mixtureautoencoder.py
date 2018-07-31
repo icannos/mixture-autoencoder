@@ -51,6 +51,8 @@ class mixture_autoencoder():
 
         self.sess = None
 
+        self.pre_train_ops = []
+
     def compile(self):
         """
         Build the graph from the parameters of the class
@@ -108,6 +110,9 @@ class mixture_autoencoder():
 
         self.train_network = tf.train.AdamOptimizer(self.learning_rate).minimize(self.loss)
 
+        for k in range(self.num_clusters):
+            self.pre_train_ops.append(tf.train.AdamOptimizer(self.learning_rate).minimize(self.losses[k]))
+
         self.init = tf.global_variables_initializer()
 
         self.saver = tf.train.Saver()
@@ -119,6 +124,19 @@ class mixture_autoencoder():
         """
         self.sess = tf.Session()
         self.sess.run(self.init)
+
+    def pretrain(self, X, k):
+        shuffle = np.arange(X.shape[0])
+        np.random.shuffle(shuffle)
+
+        for j in range(X.shape[0] // self.batch_size - 2):
+            _, loss = self.sess.run(
+                [self.pre_train_ops[k], self.lossess[k]], feed_dict=
+                {self.X: X[shuffle][j * self.batch_size:(j + 1) * self.batch_size],
+                })
+
+        return loss
+
 
     def train(self, X, entropy_strategy="balanced", sample_entropy=0, batch_entropy=0, learning_rate=0.001):
         """
@@ -175,7 +193,6 @@ class mixture_autoencoder():
 
     def __build_loss(self):
         losses = tf.stack(self.losses)
-
 
         self.element_wise_entropy = - tf.reduce_sum(self.classifier * tf.log(self.classifier), 1)
 

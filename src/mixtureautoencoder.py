@@ -246,6 +246,6 @@ class mixture_autoencoder():
         preloss = tf.reduce_mean(tf.reduce_sum(self.losses, 0) + sample_entropy * self.element_wise_entropy)
         batch_mean_entropy = tf.reduce_mean(- tf.reduce_sum(self.p_mean * tf.log(self.p_mean), 0))
 
-        batch_entropy = 0.5*(preloss/ batch_mean_entropy)
+        batch_entropy = 0.3*(preloss/ batch_mean_entropy)
 
         return (sample_entropy, batch_entropy)

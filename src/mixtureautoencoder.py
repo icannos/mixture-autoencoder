@@ -125,7 +125,7 @@ class mixture_autoencoder():
         self.sess = tf.Session()
         self.sess.run(self.init)
 
-    def pretrain(self, X, k):
+    def pretrain(self, X, k, learning_rate=0.001):
         shuffle = np.arange(X.shape[0])
         np.random.shuffle(shuffle)
 
@@ -133,6 +133,7 @@ class mixture_autoencoder():
             _, loss = self.sess.run(
                 [self.pre_train_ops[k], self.losses[k]], feed_dict=
                 {self.X: X[shuffle][j * self.batch_size:(j + 1) * self.batch_size],
+                 self.learning_rate: learning_rate
                 })
 
         return loss
@@ -156,8 +157,8 @@ class mixture_autoencoder():
                     self.sess.run([self.strat_sample_entropy, self.strat_batch_entropy],
                                   feed_dict=
                                   {self.X: X[shuffle][
-                                           j * self.batch_size:(j + 1) * self.batch_size],
-                                   self.learning_rate: learning_rate
+                                           j * self.batch_size:(j + 1) * self.batch_size]
+
                                    })
 
             print("Sample entropy:", sample_entropy,"Batch Entropy", batch_entropy)

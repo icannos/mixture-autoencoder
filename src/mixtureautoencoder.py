@@ -11,6 +11,8 @@ class mixture_autoencoder():
     sample_entropy = None
 
     def __init__(self, training_steps=3000, batch_size=256, autoencoders_topology=(128, 64, 8),
+                 hyper_param_bentropy=1,
+                 hyper_param_sentropy=1,
                  classifier_topology=(8, 8), input_dim=1024,
                  num_clusters=8,
                  autoencoders_activation=(tf.nn.tanh, tf.nn.tanh, tf.nn.tanh)):
@@ -32,6 +34,9 @@ class mixture_autoencoder():
         self.input_dim = input_dim
         self.num_clusters = num_clusters
         self.autoencoder_activation = autoencoders_activation
+
+        self.hyper_param_bentropy = hyper_param_bentropy
+        self.hyper_param_sentropy = hyper_param_sentropy
 
         # Graph variables
         self.encoders = []
@@ -139,8 +144,8 @@ class mixture_autoencoder():
             _, loss, batch_wise, p_mean = self.sess.run(
                 [self.train_network, self.loss, self.batch_wise_entropy, self.p_mean], feed_dict=
                 {self.X: X[shuffle][j * self.batch_size:(j + 1) * self.batch_size],
-                 self.sample_entropy: sample_entropy,
-                 self.batch_entropy: batch_entropy,
+                 self.sample_entropy: self.hyper_param_sentropy*sample_entropy,
+                 self.batch_entropy: self.hyper_param_bentropy*batch_entropy,
                  self.learning_rate:learning_rate
                  })
 
@@ -248,6 +253,6 @@ class mixture_autoencoder():
         preloss = tf.reduce_mean(tf.reduce_sum(self.losses, 0) + sample_entropy * self.element_wise_entropy)
         batch_mean_entropy = tf.reduce_mean(- tf.reduce_sum(self.p_mean * tf.log(self.p_mean), 0))
 
-        batch_entropy = 0.4*(preloss/ batch_mean_entropy)
+        batch_entropy =  (preloss/ batch_mean_entropy)
 
         return (sample_entropy, batch_entropy)

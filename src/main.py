@@ -28,6 +28,11 @@ if __name__ == "__main__":
 
     argparser.add_argument("--batch-size", type=int, default=64,
                            help="Size of a training batch")
+    argparser.add_argument("--hp-bentropy", type=float, default=1,
+                           help="Coefficient to apply to the sample entropy term")
+    argparser.add_argument("--hp-sentropy", type=float, default=1,
+                           help="Coefficient to apply to the batch entropy term")
+
 
     argparser.add_argument("--autoencoder-topology", nargs="+", type=int,
                            help="Dimension of each hidden layer (only one side, the rest is built by symetry")
@@ -57,7 +62,10 @@ if __name__ == "__main__":
                                 classifier_topology=tuple(args.classifier_topology),
                                 autoencoders_activation=activations,
                                 input_dim=args.input_dim,
-                                num_clusters=args.num_clusters)
+                                num_clusters=args.num_clusters,
+                                hyper_param_bentropy=args.hp_bentropy,
+                                hyper_param_sentropy=args.hp_sentropy)
+
 
 
     model.compile()

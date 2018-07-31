@@ -1,6 +1,6 @@
 import argparse
 import tensorflow as tf
-from helpers import fetch_matlab_data, savemat
+from helpers import fetch_matlab_data, savemat, fetch_matlab_data_clusters
 
 from mixtureautoencoder import mixture_autoencoder
 
@@ -10,7 +10,7 @@ if __name__ == "__main__":
     ### io parameters
 
     argparser.add_argument("--input-train", type=str,
-                           help=".mat file to open. Should contain an X matrix")
+                           help=".mat file to open. Should contain an X matrix, if pretrain then the file should contain X_0 .. X_[num_cluster-1].")
 
     argparser.add_argument("--input-predict", type=str,
                            help=".mat file to open. Should contain an X matrix")
@@ -40,7 +40,10 @@ if __name__ == "__main__":
     argparser.add_argument("--autoencoders-activation", nargs="+", type=str, choices=["tanh", "sigmoid"],
                            help="Name of the activation function. Available: tanh sigmoid relu")
 
-    ### Training hyper parameters
+    ### Training hyper
+
+    argparser.add_argument("--pre-train-steps", type=int, default=0,
+                           help="Will pretrain separatly each subautoencoded. Useful when it is difficult to assign data to different cluster")
 
     argparser.add_argument("--training-steps", type=int, default=0,
                            help="Number of training steps to perform")
@@ -91,7 +94,13 @@ if __name__ == "__main__":
     if args.load_model_file is not None:
         model.saver.restore(model.sess, args.load_model_file)
 
-    if args.input_train is not None:
+    if args.input_train is not None and args.pre_train_steps > 0:
+        X_train = fetch_matlab_data_clusters(args.input_train, args.num_clusters)
+
+        for k in range(args.num_clusters):
+            print(model.pretrain(X_train[k], k))
+
+    if args.input_train is not None and args.training_steps > 0:
         X_train = fetch_matlab_data(args.input_train)
 
         for _ in range(args.training_steps):

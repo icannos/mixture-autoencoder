@@ -32,6 +32,8 @@ if __name__ == "__main__":
                            help="Coefficient to apply to the sample entropy term")
     argparser.add_argument("--hp-sentropy", type=float, default=1,
                            help="Coefficient to apply to the batch entropy term")
+    argparser.add_argument("--hp-encoded-reg", type=float, default=0.005,
+                           help="Weigth of the regularization term")
 
 
     argparser.add_argument("--autoencoder-topology", nargs="+", type=int,
@@ -64,7 +66,8 @@ if __name__ == "__main__":
                                 input_dim=args.input_dim,
                                 num_clusters=args.num_clusters,
                                 hyper_param_bentropy=args.hp_bentropy,
-                                hyper_param_sentropy=args.hp_sentropy)
+                                hyper_param_sentropy=args.hp_sentropy,
+                                hp_encoded_reg=args.hp_encoded_reg)
 
 
 

@@ -15,7 +15,8 @@ class mixture_autoencoder():
                  hyper_param_sentropy=1,
                  classifier_topology=(8, 8), input_dim=1024,
                  num_clusters=8,
-                 autoencoders_activation=(tf.nn.tanh, tf.nn.tanh, tf.nn.tanh)):
+                 autoencoders_activation=(tf.nn.tanh, tf.nn.tanh, tf.nn.tanh),
+                 encoded_reg=0.005):
         """
         Basic initializer, all parameters can be changed by updating
         :param autoencoders_topology: defines the topology of the autoencoders (size of each hidden layer)
@@ -34,6 +35,7 @@ class mixture_autoencoder():
         self.input_dim = input_dim
         self.num_clusters = num_clusters
         self.autoencoder_activation = autoencoders_activation
+        self.encoded_reg = encoded_reg
 
         self.hyper_param_bentropy = hyper_param_bentropy
         self.hyper_param_sentropy = hyper_param_sentropy
@@ -190,7 +192,7 @@ class mixture_autoencoder():
 
         loss = tf.reduce_mean(tf.reduce_sum(self.losses, 0) +
                               self.sample_entropy * self.element_wise_entropy) - self.batch_entropy * self.batch_wise_entropy \
-                + 0.005 * tf.reduce_sum(tf.pow(self.z, 2))
+                + self.encoded_reg * tf.reduce_sum(tf.pow(self.z, 2))
 
         return loss
 

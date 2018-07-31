@@ -72,7 +72,10 @@ if __name__ == "__main__":
         X_train = fetch_matlab_data(args.input_train)
 
         for _ in range(args.training_steps):
-            print(model.train(X_train, entropy_strategy="balanced"))
+            loss, batch_wise_entropy, p_mean  = model.train(X_train, entropy_strategy="balanced")
+
+            print(f'Global_Loss {loss}, Batch entropy: {batch_wise_entropy}, Cluster mean probability: {p_mean}')
+
 
     if args.input_predict is not None:
         X_test = fetch_matlab_data(args.input_predict)

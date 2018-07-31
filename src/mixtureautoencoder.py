@@ -185,7 +185,7 @@ class mixture_autoencoder():
 
         loss = tf.reduce_mean(tf.reduce_sum(self.losses, 0) +
                               self.sample_entropy * self.element_wise_entropy) - self.batch_entropy * self.batch_wise_entropy \
-                + 0.005 * tf.reduce_sum(tf.pow(self.Z, 2))
+                + 0.005 * tf.reduce_sum(tf.pow(self.z, 2))
 
         return loss
 

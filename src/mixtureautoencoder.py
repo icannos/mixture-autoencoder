@@ -157,6 +157,7 @@ class mixture_autoencoder():
                                   feed_dict=
                                   {self.X: X[shuffle][
                                            j * self.batch_size:(j + 1) * self.batch_size],
+                                   self.learning_rate: learning_rate
                                    })
 
             print("Sample entropy:", sample_entropy,"Batch Entropy", batch_entropy)

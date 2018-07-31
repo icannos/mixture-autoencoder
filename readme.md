@@ -7,8 +7,12 @@ This is an implementation of the model described in this paper Mixture Autoencod
 ## Usage
 
 ``
-python3 main.py --input tests/
+python3 src/main.py --input-train tests/clusters_norm_10_train.mat --training-steps 100 --classifier-topology 64 32 16  
+--num-clusters 3 --autoencoder-topology 64 32 16 8 --input-dim 8 --input-predict tests/clusters_norm_10_test_1.mat 
+--output results.mat --autoencoders-activation tanh tanh tanh tanh
 ``
+
+
 
 ```
 usage: Mixture Autoencoder model [-h] [--input-train INPUT_TRAIN]

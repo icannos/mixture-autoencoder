@@ -63,7 +63,6 @@ if __name__ == "__main__":
 
 
     ### Loading data
-    data = fetch_matlab_data(args.input_train)
 
     if args.load_model_file is not None:
         model.saver.restore(model.sess, args.load_model_file)

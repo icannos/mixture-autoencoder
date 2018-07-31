@@ -6,6 +6,10 @@ This is an implementation of the model described in this paper Mixture Autoencod
 
 ## Usage
 
+``
+python3 main.py --input tests/
+``
+
 ```
 usage: Mixture Autoencoder model [-h] [--input-train INPUT_TRAIN]
                                  [--input-predict INPUT_PREDICT]

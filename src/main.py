@@ -74,7 +74,8 @@ if __name__ == "__main__":
         for _ in range(args.training_steps):
             loss, batch_wise_entropy, p_mean  = model.train(X_train, entropy_strategy="balanced")
 
-            print(f'Global_Loss {loss}, Batch entropy: {batch_wise_entropy}, Cluster mean probability: {p_mean}')
+            print("Global_Loss {loss}, Batch entropy: {batch_wise_entropy}, Cluster mean probability: {p_mean}".format(
+                loss=loss, batch_wise_entropy=batch_wise_entropy, p_mean=p_mean))
 
 
     if args.input_predict is not None:

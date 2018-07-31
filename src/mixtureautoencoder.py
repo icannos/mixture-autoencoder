@@ -131,7 +131,7 @@ class mixture_autoencoder():
 
         for j in range(X.shape[0] // self.batch_size - 2):
             _, loss = self.sess.run(
-                [self.pre_train_ops[k], self.lossess[k]], feed_dict=
+                [self.pre_train_ops[k], self.losses[k]], feed_dict=
                 {self.X: X[shuffle][j * self.batch_size:(j + 1) * self.batch_size],
                 })
 

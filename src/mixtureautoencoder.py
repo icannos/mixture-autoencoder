@@ -126,12 +126,15 @@ class mixture_autoencoder():
 
         for j in range(X.shape[0] // self.batch_size - 2):
             if entropy_strategy == "balanced":
+
                 sample_entropy, batch_entropy = \
                     self.sess.run([self.strat_sample_entropy, self.strat_batch_entropy],
                                   feed_dict=
                                   {self.X: X[shuffle][
                                            j * self.batch_size:(j + 1) * self.batch_size],
                                    })
+
+            print("Sample entropy:", sample_entropy,"Batch Entropy", batch_entropy)
 
             _, loss, batch_wise, p_mean = self.sess.run(
                 [self.train_network, self.loss, self.batch_wise_entropy, self.p_mean], feed_dict=
@@ -243,6 +246,6 @@ class mixture_autoencoder():
         preloss = tf.reduce_mean(tf.reduce_sum(self.losses, 0) + sample_entropy * self.element_wise_entropy)
         batch_mean_entropy = tf.reduce_mean(- tf.reduce_sum(self.p_mean * tf.log(self.p_mean), 0))
 
-        batch_entropy = 1.5*( preloss/ batch_mean_entropy)
+        batch_entropy = preloss/ batch_mean_entropy
 
         return (sample_entropy, batch_entropy)

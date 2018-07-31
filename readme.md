@@ -6,7 +6,7 @@ This is an implementation of the model described in this paper Mixture Autoencod
 
 ## Usage
 
-'''
+```
 usage: Mixture Autoencoder model [-h] [--input-train INPUT_TRAIN]
                                  [--input-predict INPUT_PREDICT]
                                  [--output OUTPUT]
@@ -52,4 +52,4 @@ optional arguments:
                         Strategy to use to define weights of sample entropy
                         and batch entropy
 
-'''
+```

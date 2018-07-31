@@ -169,6 +169,10 @@ class mixture_autoencoder():
     def __build_loss(self):
         losses = tf.stack(self.losses)
 
+        l1_regularizer = tf.contrib.layers.l1_regularizer(
+            scale=0.005, scope=None
+        )
+
         self.element_wise_entropy = - tf.reduce_sum(self.classifier * tf.log(self.classifier), 1)
 
         self.p_mean = tf.reduce_mean(self.classifier, 0)
@@ -183,7 +187,8 @@ class mixture_autoencoder():
                                           self.sample_entropy * self.element_wise_entropy)
 
         loss = tf.reduce_mean(tf.reduce_sum(self.losses, 0) +
-                              self.sample_entropy * self.element_wise_entropy) - self.batch_entropy * self.batch_wise_entropy
+                              self.sample_entropy * self.element_wise_entropy) - self.batch_entropy * self.batch_wise_entropy \
+                + tf.contrib.layers.apply_regularization(l1_regularizer, losses)
 
         return loss
 

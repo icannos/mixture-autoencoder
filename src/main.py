@@ -26,6 +26,9 @@ if __name__ == "__main__":
     argparser.add_argument("--training-steps", type=int, default=0,
                            help="Number of training steps to perform")
 
+    argparser.add_argument("--batch-size", type=int, default=64,
+                           help="Size of a training batch")
+
     argparser.add_argument("--autoencoder-topology", nargs="+", type=int,
                            help="Dimension of each hidden layer (only one side, the rest is built by symetry")
     argparser.add_argument("--classifier-topology", nargs="+", type=int,
@@ -49,7 +52,8 @@ if __name__ == "__main__":
         if s == "sigmoid":
             activations.append(tf.nn.sigmoid)
 
-    model = mixture_autoencoder(autoencoders_topology=tuple(args.autoencoder_topology),
+    model = mixture_autoencoder(batch_size=args.batch_size,
+                                autoencoders_topology=tuple(args.autoencoder_topology),
                                 classifier_topology=tuple(args.classifier_topology),
                                 autoencoders_activation=activations,
                                 input_dim=args.input_dim,

@@ -170,8 +170,8 @@ class mixture_autoencoder():
     # Private methods
 
     def __build_cluster_loss(self, k):
-        return tf.reduce_sum(tf.pow(self.Y_true - self.Y_preds[k], 2, name="cluster_loss" + str(k)),
-                             1) * self.classifier[:, k]
+        return (tf.reduce_sum(tf.pow(self.Y_true - self.Y_preds[k], 2, name="cluster_loss" + str(k)),1) +
+                self.encoded_reg) * tf.reduce_sum(tf.pow(self.encoders[k], 2))  * self.classifier[:, k]
 
     def __build_loss(self):
         losses = tf.stack(self.losses)
@@ -191,8 +191,7 @@ class mixture_autoencoder():
                                           self.sample_entropy * self.element_wise_entropy)
 
         loss = tf.reduce_mean(tf.reduce_sum(self.losses, 0) +
-                              self.sample_entropy * self.element_wise_entropy) - self.batch_entropy * self.batch_wise_entropy \
-                + self.encoded_reg * tf.reduce_sum(tf.pow(self.z, 2))
+                              self.sample_entropy * self.element_wise_entropy) - self.batch_entropy * self.batch_wise_entropy
 
         return loss
 

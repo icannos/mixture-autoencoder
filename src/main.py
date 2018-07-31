@@ -7,6 +7,8 @@ from mixtureautoencoder import mixture_autoencoder
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser("Mixture Autoencoder model")
 
+    ### io parameters
+
     argparser.add_argument("--input-train", type=str,
                            help=".mat file to open. Should contain an X matrix")
 
@@ -23,9 +25,29 @@ if __name__ == "__main__":
     argparser.add_argument("--load-model-file",  type=str,
                            help="File from which load weigths")
 
+    ### Topology parameters
+
+    argparser.add_argument("--num-clusters", type=int, help="Number of expected clusters")
+
+    argparser.add_argument("--input-dim", type=int, help="dimension of an entry vector")
+
+    argparser.add_argument("--autoencoder-topology", nargs="+", type=int,
+                           help="Dimension of each hidden layer (only one side, the rest is built by symetry")
+
+    argparser.add_argument("--classifier-topology", nargs="+", type=int,
+                           help="Dimension of each hidden layer of the classifier network")
+
+    argparser.add_argument("--autoencoders-activation", nargs="+", type=str, choices=["tanh", "sigmoid"],
+                           help="Name of the activation function. Available: tanh sigmoid relu")
+
+    ### Training hyper parameters
+
     argparser.add_argument("--training-steps", type=int, default=0,
                            help="Number of training steps to perform")
 
+    argparser.add_argument("--entropy-strategy", type=str,
+                           help="Strategy to use to define weights of sample entropy and batch entropy",
+                           default="balanced")
     argparser.add_argument("--batch-size", type=int, default=64,
                            help="Size of a training batch")
     argparser.add_argument("--hp-bentropy", type=float, default=1,
@@ -34,19 +56,6 @@ if __name__ == "__main__":
                            help="Coefficient to apply to the batch entropy term")
     argparser.add_argument("--hp-encoded-reg", type=float, default=0.005,
                            help="Weigth of the regularization term")
-
-
-    argparser.add_argument("--autoencoder-topology", nargs="+", type=int,
-                           help="Dimension of each hidden layer (only one side, the rest is built by symetry")
-    argparser.add_argument("--classifier-topology", nargs="+", type=int,
-                           help="Dimension of each hidden layer of the classifier network")
-    argparser.add_argument("--input-dim", type=int, help="dimension of an entry vector")
-    argparser.add_argument("--num-clusters", type=int, help="Number of expected clusters")
-    argparser.add_argument("--autoencoders-activation", nargs="+", type=str,
-                           help="Name of the activation function. Available: tanh sigmoid relu")
-
-    argparser.add_argument("--entropy-strategy", type=str,
-                           help="Strategy to use to define weights of sample entropy and batch entropy", default="balanced")
 
     args = argparser.parse_args()
 
